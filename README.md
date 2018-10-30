@@ -26,20 +26,20 @@ Submit any request or issue to project issues tracker.
 - Feel free to fork repository, test your code and submit pull request.
 
 ### Custom Extensions
-- see wiki page (https://github.com/apincik/InstaNet/wiki/) how to write custom extensions
+- see wiki page (https://github.com/apincik/InstaNet/wiki/Extensions) how to write custom extensions
 
 ### Common issues
 - check project solution in order to resolve packages/references
 
-### Feature updates
+### Possible improvements
 - [ ] namespace updates
 - [ ] application config split
-- [ ] HTML DOM selectors move to separete loader
+- [ ] HTML DOM selectors move to separate loader
 - [ ] new bot builders
 - [ ] UI for application management
 - [ ] new bot scenarios (*issues tracking*)
-
-*With BC break prevention*
+- [ ] change WebDriver object visibility
+- [ ] better interface for bot logic explorers and extensions
 
 ### Example
 - see Example project inside repository
