@@ -117,6 +117,8 @@ namespace Bot.Instagram.Explorers
                     }
                 }
 
+				await Task.Delay(Utils.Delay.GetRandomSecondsDelay(5, 5));
+				
                 //click not now if get app dialog is presented
                 if (WebDriver.FindElements(By.XPath(DomSelector.LOGIN_GET_APP_DIALOG)).Count > 0)
                 {

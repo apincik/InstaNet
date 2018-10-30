@@ -118,5 +118,10 @@ namespace Bot.Browser
         {
             _options.AddArgument("start-maximized");
         }
+		
+		public bool IsOpened()
+		{
+			return _isOpened;
+		}
     }
 }

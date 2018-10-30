@@ -266,6 +266,7 @@ namespace Bot.Instagram
 
             try
             {
+				_webExplorer.DismissDialog();
                 await _webExplorer.OpenExploreTagsPageByTag(instagramTag);
                 await Task.Delay(_config.WaitSecondsBetweenActions);
     
@@ -372,6 +373,7 @@ namespace Bot.Instagram
             }
             catch (RuntimeException e)
             {
+				_webExplorer.DismissDialog();
                 await _logger.LogError(e.Message);
                 return 0;
             }

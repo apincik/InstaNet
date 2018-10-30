@@ -57,6 +57,7 @@ namespace User.Bots
             if (split)
             {
                 int actionsPerTag = toDoActions / job.Tags.Count;
+                actionsPerTag = actionsPerTag == 0 ? 1 : actionsPerTag;
                 //currentTags.ForEach((x) => x.Limit = actionsPerTag);
                 int perCount = 0;
                 while (perCount < toDoActions)
@@ -69,13 +70,17 @@ namespace User.Bots
                             actionsPerTag = toDoActions - perCount;
                         }
 
-                        perCount += actionsPerTag;
-                        x.Limit = actionsPerTag;
+                        if (perCount + actionsPerTag <= toDoActions)
+                        {
+                            perCount += actionsPerTag;
+                            x.Limit = actionsPerTag;
+                        }
+                        
                     });
                 }
 
                 //Fullfill all toDoActions, add missing count to first tag.
-                if (actionsPerTag * job.Tags.Count < toDoActions)
+                if (actionsPerTag > 0 && (actionsPerTag * job.Tags.Count) < toDoActions)
                 {
                     currentTags[0].Limit += toDoActions - (actionsPerTag * job.Tags.Count);
                 }
@@ -108,7 +113,15 @@ namespace User.Bots
             {
                 foreach (Tag tag in currentTags)
                 {
+                    if(tag.Limit == 0)
+                    {
+                        continue;
+                    }
                     processedActionsCount += await followLikeJob(tag.Name, tag.Limit, _behaviour);
+                    if(processedActionsCount + job.LimitDone >= job.Limit)
+                    {
+                        break;
+                    }
                 }
             }
 
