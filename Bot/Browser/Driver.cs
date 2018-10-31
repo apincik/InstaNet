@@ -10,7 +10,7 @@ namespace Bot.Browser
     /// </summary>
     public class Driver
     {
-        private static readonly Driver _instance = new Driver();
+        private static Driver _instance;
 
         private ChromeDriver WebDriver;
 
@@ -39,6 +39,11 @@ namespace Bot.Browser
         
         public static Driver GetInstance()
         {
+            if(_instance == null)
+            {
+                _instance = new Driver();
+            }
+
             return _instance;
         }
 
@@ -81,6 +86,7 @@ namespace Bot.Browser
         {
             WebDriver.Close();
             _isOpened = false;
+            _instance = null;
         }
 
         public void SetProxy(string ipAddress, string port, string username, string password)
@@ -118,10 +124,10 @@ namespace Bot.Browser
         {
             _options.AddArgument("start-maximized");
         }
-		
-		public bool IsOpened()
-		{
-			return _isOpened;
-		}
+
+        public bool IsOpened()
+        {
+            return _isOpened;
+        }
     }
 }
