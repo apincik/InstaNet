@@ -132,6 +132,9 @@ namespace Bot.Instagram
             }
             catch(RuntimeException e)
             {
+                _webExplorer.OpenInstagram();
+                await Task.Delay(5000);
+                _webExplorer.DismissDialog();
                 await _logger.LogError(e.Message);
             }
 
@@ -194,6 +197,9 @@ namespace Bot.Instagram
                 }
                 catch (RuntimeException e)
                 {
+                    _webExplorer.OpenInstagram();
+                    await Task.Delay(5000);
+                    _webExplorer.DismissDialog();
                     await _logger.LogError("FollowFeedUsersByTag runtime exception caught.");
                     return false;
                 }
@@ -236,6 +242,9 @@ namespace Bot.Instagram
                     }
                 } catch(RuntimeException e)
                 {
+                    _webExplorer.OpenInstagram();
+                    await Task.Delay(5000);
+                    _webExplorer.DismissDialog();
                     await _logger.LogError("LikeUserPostFromFeedByTag runtime exception caught.");
                     return false;
                 }
@@ -266,7 +275,8 @@ namespace Bot.Instagram
 
             try
             {
-				_webExplorer.DismissDialog();
+                //Check for dialog popup
+                _webExplorer.DismissDialog();
                 await _webExplorer.OpenExploreTagsPageByTag(instagramTag);
                 await Task.Delay(_config.WaitSecondsBetweenActions);
     
@@ -373,7 +383,9 @@ namespace Bot.Instagram
             }
             catch (RuntimeException e)
             {
-				_webExplorer.DismissDialog();
+                _webExplorer.OpenInstagram();
+                await Task.Delay(5000);
+                _webExplorer.DismissDialog();
                 await _logger.LogError(e.Message);
                 return 0;
             }
