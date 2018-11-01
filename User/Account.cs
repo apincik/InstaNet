@@ -60,7 +60,10 @@ namespace User
                     SetupManager(job);
                    
                     //Login to acc if not logged in already from previous job.
-                    bool result = await _manager.Login();
+                    if(!(await _manager.Login()))
+                    {
+                        continue;
+                    }
                     await _manager.AfterLogin();
 
                     //Perform bot action
