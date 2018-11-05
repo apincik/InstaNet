@@ -359,7 +359,7 @@ namespace Bot.Instagram
                         await Task.Delay(_config.WaitSecondsBetweenActions);
 
                         //Finish when likes done or number of failes is two times more than requested likeCount.
-                        if (++counter >= likeCount || numberOfFailedActions >= (likeCount * 2))
+                        if (++counter >= likeCount || numberOfFailedActions > _config.NumberOfFailedActions)
                         {
                             //Will break while loop.
                             isAllDone = true;

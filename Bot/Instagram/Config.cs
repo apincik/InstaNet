@@ -21,6 +21,27 @@ namespace Bot.Instagram
 
         public bool RandomHomeScrollAfterLogin = true;
 
+        //Number of actions when no like/follow is clicked because of behaviour or error during single run.
+        private int _numberOfFailedActions = 100;
+
+        public int NumberOfFailedActions
+        {
+            get
+            {
+                return _numberOfFailedActions;
+            }
+
+            set
+            {
+                if(value <= 0)
+                {
+                    throw new ApplicationException("Number of failed actions must be highter than 0.");
+                }
+
+                _numberOfFailedActions = value;
+            }
+        }
+
         public int MinWaitSecondsBetweenActions = 2;
         public int MaxWaitSecondsBetweenActions = 5;
         public int WaitSecondsAfterJobFinish = 10;
