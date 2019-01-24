@@ -13,7 +13,7 @@ namespace Bot.Helper
     {
         public static readonly string CREATE_PHOTO_BUTTON_NEXT = "//button[text()='Next']";
 
-        public static readonly string CREATE_PHOTO_EXPAND = "//span[contains(@class, 'createSpriteExpand')]";
+        public static readonly string CREATE_PHOTO_EXPAND = "//span[contains(@class, 'Expand')]";
 
         public static readonly string CREATE_PHOTO_DESCSRIPTION = "//textarea";
 
@@ -38,7 +38,12 @@ namespace Bot.Helper
 
         public static readonly string LOGIN_UNUSUAL_ATTEMPT_ERROR = "//*[@id='react-root']/section/div/div/div[2]/h2";
 
+        public static readonly string LOGIN_SAVE_PASSWORD_DISMISS_BUTTON = "//button[text()='Not Now']";
+
         public static readonly string LAYOUT_DIALOG = "//div[@role='dialog']";
+
+        public static readonly string ERROR_PAGE_NOT_FOUND = "//div[contains(@class, 'ErrorPage')]";
+
 
         //Universal dialog dissmis, click on 2nd button automatically.
         public static readonly string LAYOUT_DIALOG_BUTTON_DISMISS = "//div[@role='dialog']//button[2]";
@@ -85,6 +90,12 @@ namespace Bot.Helper
 
         public static readonly string USER_FOLLOWING_PAGE = "//a[contains(@href, '/following/')]";
 
+        public static readonly string USER_FOLLOWERS_PAGE = "//a[contains(@href, '/followers/')]";
+
+        public static readonly string POST_LIKED_BY = "//a[contains(@href, '/liked_by/')]";
+
+
+        public static readonly string UNFOLLOW_FOLLOWED_BTNS = "//button[text()='Following']";
 
         public static readonly string UNFOLLOW_FOLLOWED_USERS_LIST = "//*[@class='NroHT']";
 

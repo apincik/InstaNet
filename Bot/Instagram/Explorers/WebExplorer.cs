@@ -24,6 +24,23 @@ namespace Bot.Instagram.Explorers
         }
 
         /// <summary>
+        /// Check layout for element if page was not found.
+        /// </summary>
+        /// <returns></returns>
+        // @TODO Move to parent class, throw exception in implementation like OpenInstagram methods.
+        public bool IsErrorPage()
+        {
+            return WebDriver.FindElements(By.XPath(DomSelector.ERROR_PAGE_NOT_FOUND)).Count > 0;
+        }
+
+        public void OpenLikedByPage()
+        {
+            var followingPageLink = WebDriver.FindElement(By.XPath(DomSelector.POST_LIKED_BY));
+            ExecuteJsClick(followingPageLink);
+            Wait(5);
+        }
+
+        /// <summary>
         /// Open page on instagram.com domain.
         /// </summary>
         /// <param name="page"></param>
@@ -69,11 +86,48 @@ namespace Bot.Instagram.Explorers
         }
 
         /// <summary>
-        /// Open explore tags page by tag name.
+        /// Open following page by username.
+        /// </summary>
+        /// <param name="username"></param>
+        public async Task OpenFollowersPageByName(string username)
+        {
+            try
+            {
+                string url = $"https://www.instagram.com/p/BppUpy9lozc/";
+                WebDriver.Url = url;
+                WebDriver.Navigate();
+                Wait(3);
+
+                await Task.Delay(2000);
+
+                //FIX - current link navigate only to profile page
+                var followingPageLink = WebDriver.FindElement(By.XPath(DomSelector.POST_LIKED_BY));
+                //followingPageLink.Click();
+                ExecuteJsClick(followingPageLink);
+                Wait(5);
+
+                await Task.Delay(2000);
+
+                //GoBack();
+
+                //Click followers again prevent mutual list loading from first click
+                //followingPageLink = WebDriver.FindElement(By.XPath(DomSelector.USER_FOLLOWERS_PAGE));
+                //ExecuteJsClick(followingPageLink);
+                //Wait(5);
+
+            }
+            catch (NoSuchElementException e)
+            {
+                throw new RuntimeException("OpenFollowersPageByName element exception.");
+            }
+        }
+
+        /// <summary>
+        /// Perform open explore tags page by tag name.
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
-        public async Task OpenExploreTagsPageByTag(string tag)
+        public async Task PerformExploreTagsPageByTag(string tag)
         {
             try
             {

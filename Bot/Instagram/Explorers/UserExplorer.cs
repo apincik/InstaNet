@@ -117,8 +117,8 @@ namespace Bot.Instagram.Explorers
                     }
                 }
 
-				await Task.Delay(Utils.Delay.GetRandomSecondsDelay(5, 5));
-				
+                await Task.Delay(Utils.Delay.GetRandomSecondsDelay(5, 5));
+
                 //click not now if get app dialog is presented
                 if (WebDriver.FindElements(By.XPath(DomSelector.LOGIN_GET_APP_DIALOG)).Count > 0)
                 {
@@ -128,6 +128,17 @@ namespace Bot.Instagram.Explorers
                         notNowElement.Click();
                         Wait(2);
                     }
+                }
+
+                await Task.Delay(Utils.Delay.GetRandomSecondsDelay(3, 5));
+
+                //click not now if save password dialog popup
+                if (WebDriver.FindElements(By.XPath(DomSelector.LOGIN_SAVE_PASSWORD_DISMISS_BUTTON)).Count > 0)
+                {
+                    var savePasswordBtnDismiss = WebDriver.FindElement(By.XPath(DomSelector.LOGIN_SAVE_PASSWORD_DISMISS_BUTTON));
+                    IJavaScriptExecutor btnSavePasswordDismissEx = (IJavaScriptExecutor)WebDriver;
+                    btnSavePasswordDismissEx.ExecuteScript("arguments[0].click();", savePasswordBtnDismiss);
+                    Wait(5);
                 }
 
                 //Hide desktop notifications dialog if presented

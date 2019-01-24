@@ -43,9 +43,16 @@ namespace Bot.Instagram.Explorers
                 await Task.Delay(rand.Next(500, 3000));
 
                 //click expand photo
-                var expandButton = WebDriver.FindElementByXPath(DomSelector.CREATE_PHOTO_EXPAND);
-                ExecuteJsClick(expandButton);
-                Wait(5);
+                try
+                {
+                    var expandButton = WebDriver.FindElementByXPath(DomSelector.CREATE_PHOTO_EXPAND);
+                    ExecuteJsClick(expandButton);
+                    Wait(5);
+                }
+                catch(NoSuchElementException e)
+                {
+                    //ignore expand
+                }
 
                 //click next button
                 var nextButton = WebDriver.FindElementByXPath(DomSelector.CREATE_PHOTO_BUTTON_NEXT);
@@ -54,10 +61,13 @@ namespace Bot.Instagram.Explorers
                 Wait(5);
 
                 //insert photo description
-                var photoDescription = WebDriver.FindElementByXPath(DomSelector.CREATE_PHOTO_DESCSRIPTION);
-                photoDescription.Clear();
-                photoDescription.SendKeys(description);
-                Wait(1);
+                if (description != null)
+                {
+                    var photoDescription = WebDriver.FindElementByXPath(DomSelector.CREATE_PHOTO_DESCSRIPTION);
+                    photoDescription.Clear();
+                    photoDescription.SendKeys(description);
+                    Wait(1);
+                }
 
                 await Task.Delay(rand.Next(5000, 12000));
 
@@ -69,7 +79,7 @@ namespace Bot.Instagram.Explorers
             }
             catch(NoSuchElementException e)
             {
-                throw new RuntimeException("Finding element during submit photo failed.", e);
+                throw new RuntimeException($"Finding element during submit photo failed - {e.Message}", e);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using OpenQA.Selenium;
 using System.Threading.Tasks;
 using Bot.Exception;
@@ -100,10 +100,10 @@ namespace Bot.Instagram.Explorers
 
                 foreach (var post in posts)
                 {
-                    var link = post.FindElement(By.XPath(".//a"));
-                    var image = post.FindElement(By.XPath(".//img"));
+                    var link = post.GetAttribute("href"); //post.FindElement(By.XPath(".//a"));
+                    //var image = post.FindElement(By.XPath(".//img"));
 
-                    Post instaPost = new Post() { url = link.GetAttribute("href"), imageUrl = image.GetAttribute("src") };
+                    Post instaPost = new Post() { url = link, imageUrl = "" };
                     instaPosts.Add(instaPost);
                 }
 

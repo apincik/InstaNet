@@ -24,7 +24,7 @@ namespace Bot.Browser.Extensions
          */
         protected override void Init()
         {
-            if(String.IsNullOrEmpty(_ipAddress) || String.IsNullOrEmpty(_password))
+            if(String.IsNullOrEmpty(_ipAddress) || String.IsNullOrEmpty(_port))
             {
                 throw new ApplicationException("Undefined browser proxy extension connection details.");
             }

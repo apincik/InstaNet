@@ -131,11 +131,11 @@ namespace Bot.Instagram
             int randFollowsAtOnce = rand.Next(minFollowsAtOnce, maxFollowsAtOnce);
 
             //@todo uncomment for randomized values
-            //LikesAtOnce = randLikesAtOnce;
-            //LikesPerTag = settings.LikesPerTag;
+            LikesAtOnce = randLikesAtOnce;
+            LikesPerTag = settings.LikesPerTag;
             SplitLikesPerAllTags = settings.SplitLikesPerAllTags == 1;
-            //FollowsAtOnce = randFollowsAtOnce;
-            //FollowsPerTag = settings.FollowsPerTag;
+            FollowsAtOnce = randFollowsAtOnce;
+            FollowsPerTag = settings.FollowsPerTag;
             SplitFollowsPerAllTags = settings.SplitFollowsPerAllTags == 1;
             //RandomActionsOrder = settings.RandomActionsOrder == 1;
 

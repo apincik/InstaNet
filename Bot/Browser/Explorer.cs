@@ -19,21 +19,18 @@ namespace Bot.Browser
         public Explorer(Config config)
         {
             _browserDriver = Driver.GetInstance();
-			_config = config;
+            _config = config;
         }
 
         public void Open()
         {
-			if(!_browserDriver.IsOpened())
+            if(!_browserDriver.IsOpened())
             {
                 _browserDriver.SetProxy(_config.Proxy.IpAddress, _config.Proxy.Port, _config.Proxy.Username, _config.Proxy.Password);
                 _browserDriver.IsRandomMobileWindowSize = _config.RandomWindowSize;
                 _browserDriver.SetUserAgent(_config.UserAgent);
             }
 
-            _browserDriver.Open();
-            WebDriver = _browserDriver.GetDriver();
-			
             _browserDriver.Open();
             WebDriver = _browserDriver.GetDriver();
         }

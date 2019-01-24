@@ -15,6 +15,7 @@ namespace Bot.Instagram
     sealed public class Manager : IDisposable
     {
         private readonly string URL_LOGIN = "/accounts/login/";
+        private readonly string URL_TAGS = "/explore/tags/";
 
         private WebExplorer _webExplorer;
         private ActionExplorer _actionExplorer;
@@ -132,8 +133,8 @@ namespace Bot.Instagram
             }
             catch(RuntimeException e)
             {
-                _webExplorer.OpenInstagram();
-                await Task.Delay(5000);
+                _webExplorer.OpenInstagram("/");
+                await Task.Delay(10000);
                 _webExplorer.DismissDialog();
                 await _logger.LogError(e.Message);
             }
@@ -197,8 +198,10 @@ namespace Bot.Instagram
                 }
                 catch (RuntimeException e)
                 {
-                    _webExplorer.OpenInstagram();
-                    await Task.Delay(5000);
+                    _webExplorer.GoBack();
+                    await Task.Delay(1000);
+                    _webExplorer.OpenInstagram("/");
+                    await Task.Delay(10000);
                     _webExplorer.DismissDialog();
                     await _logger.LogError("FollowFeedUsersByTag runtime exception caught.");
                     return false;
@@ -242,8 +245,10 @@ namespace Bot.Instagram
                     }
                 } catch(RuntimeException e)
                 {
-                    _webExplorer.OpenInstagram();
-                    await Task.Delay(5000);
+                    _webExplorer.GoBack();
+                    await Task.Delay(1000);
+                    _webExplorer.OpenInstagram("/");
+                    await Task.Delay(10000);
                     _webExplorer.DismissDialog();
                     await _logger.LogError("LikeUserPostFromFeedByTag runtime exception caught.");
                     return false;
@@ -277,8 +282,23 @@ namespace Bot.Instagram
             {
                 //Check for dialog popup
                 _webExplorer.DismissDialog();
-                await _webExplorer.OpenExploreTagsPageByTag(instagramTag);
+                try
+                {
+                    await _webExplorer.PerformExploreTagsPageByTag(instagramTag);
+                }
+                catch(RuntimeException e)
+                {
+                    _webExplorer.OpenInstagram($"{URL_TAGS}{instagramTag}/");
+                    await Task.Delay(_config.WaitSecondsBetweenActions);
+                    _webExplorer.DismissDialog();
+                }
+                
                 await Task.Delay(_config.WaitSecondsBetweenActions);
+
+                if(_webExplorer.IsErrorPage())
+                {
+                    throw new PageNotFoundException($"Tag page not found {instagramTag}.");
+                }
     
                 //@TODO Does not solve  further page scrolling in while.
                 var pagePostElementsCount = (await _feedExplorer.FindExplorePageElements(false, 1)).Count; 
@@ -286,6 +306,11 @@ namespace Bot.Instagram
                 while (!isAllDone)
                 {
                     var postElements = await _feedExplorer.FindExplorePageElements(false, 1);
+                    if(postElements.Count == 0)
+                    {
+                        break;
+                    }
+
                     foreach (var element in postElements)
                     {
                         string href = element.GetAttribute("href");
@@ -383,11 +408,20 @@ namespace Bot.Instagram
             }
             catch (RuntimeException e)
             {
-                _webExplorer.OpenInstagram();
-                await Task.Delay(5000);
+                _webExplorer.GoBack();
+                await Task.Delay(1000);
+                _webExplorer.OpenInstagram("/");
+                await Task.Delay(10000);
                 _webExplorer.DismissDialog();
                 await _logger.LogError(e.Message);
                 return 0;
+            }
+            catch(PageNotFoundException e)
+            {
+                _webExplorer.GoBack();
+                await Task.Delay(1000);
+                await _logger.LogWarning(e.Message);
+                _webExplorer.DismissDialog();
             }
 
             return counter;
@@ -409,8 +443,21 @@ namespace Bot.Instagram
             try
             {
                 _actionExplorer.DismissDialog();
-                await _webExplorer.OpenExploreTagsPageByTag(instagramTag);
-                await Task.Delay(_config.WaitSecondsBetweenActions);
+                try
+                {
+                    await _webExplorer.PerformExploreTagsPageByTag(instagramTag);
+                }
+                catch (RuntimeException e)
+                {
+                    _webExplorer.OpenInstagram($"{URL_TAGS}{instagramTag}/");
+                    await Task.Delay(_config.WaitSecondsBetweenActions);
+                    _webExplorer.DismissDialog();
+                }
+
+                if (_webExplorer.IsErrorPage())
+                {
+                    throw new PageNotFoundException($"LikeFeedPostsByTag tag page not found {instagramTag}.");
+                }
 
                 var posts = await _feedExplorer.FindExplorePagePosts(true, 3);
                 foreach (var post in posts)
@@ -418,9 +465,9 @@ namespace Bot.Instagram
                     _webExplorer.OpenPage(post.url);
                     await Task.Delay(_config.WaitSecondsBetweenActions);
 
+                    //Decrement counter if not liked feed post.
                     if (!_actionExplorer.LikePostOnPage())
                     {
-                        //Decrement counter if not liked feed post.
                         counter--;
                     }
 
@@ -442,6 +489,13 @@ namespace Bot.Instagram
             catch (RuntimeException e)
             {
                 await _logger.LogError(e.Message);
+            }
+            catch(PageNotFoundException e)
+            {
+                _webExplorer.GoBack();
+                await Task.Delay(1000);
+                await _logger.LogError(e.Message);
+                _webExplorer.DismissDialog();
             }
 
             return counter;
@@ -482,6 +536,14 @@ namespace Bot.Instagram
         }
 
         /// <summary>
+        /// Run after job run.
+        /// </summary>
+        public async Task AfterJob()
+        {
+            _webExplorer.DismissDialog();
+        }
+
+        /// <summary>
         /// Handle user login.
         /// </summary>
         /// <returns></returns>
@@ -505,10 +567,12 @@ namespace Bot.Instagram
             catch(LoginException e)
             {
                 await _logger.LogWarning("Login failed [username=" + _config.Username + "]");
+                return false;
             }
             catch(AccountSecurityException e)
             {
                 await _logger.LogWarning("Login failed for security reasons [username=" + _config.Username + "]");
+                return false;
             }
             catch(RuntimeException e)
             {
@@ -537,6 +601,64 @@ namespace Bot.Instagram
             {
                 throw e;
             }
+        }
+
+        /// <summary>
+        /// Vist provided user profile and like post from feed if any found.
+        /// </summary>
+        /// <param name="users"></param>
+        /// <returns></returns>
+        public async Task<JobResult> ActionByUsernames(List<User> users, bool doLike, bool doFollow)
+        {
+            int processedCount = 0;
+            int resultCount = 0;
+
+            try
+            {
+                foreach (User user in users)
+                {
+                    //@TODO Possible to use searchbar.
+                    _webExplorer.OpenPage(user.Url);
+                    var postElements = _feedExplorer.FindUserPagePostsElements();
+                    processedCount++;
+
+                    bool userLiked = false;
+                    bool userFollowed = false;
+
+                    if (doLike)
+                    {
+                        if (postElements.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        //Open post page.
+                        _webExplorer.ExecuteJsClick(postElements.First());
+                        userLiked = _actionExplorer.LikePostOnPage();
+                    }
+                    
+                    userFollowed = doFollow && _actionExplorer.FollowUser();
+                    if (userLiked || userFollowed)
+                    {
+                        resultCount++;
+                    }
+
+                    //Go back to homepage feed.
+                    _webExplorer.GoBack();
+                    await Task.Delay(Utils.Delay.GetRandomSecondsDelay(2, 5));
+                    _webExplorer.DismissDialog();
+                }
+            }
+            catch (RuntimeException e)
+            {
+                await _logger.LogError($"LikeByUsername runtime exception - {e.Message}");
+            }
+
+            return new JobResult()
+            {
+                ProcessedCount = processedCount,
+                ResultCount = resultCount
+            };
         }
 
         /// <summary>

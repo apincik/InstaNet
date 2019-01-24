@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +18,7 @@ namespace Bot.Instagram.Model.Enum
         TYPE_LOG_LEVEL_INFO = 15,
         TYPE_LOG_LEVEL_WARNING = 16,
         TYPE_LOG_LEVEL_ERROR = 17,
+
+        TYPE_JOB_PROGRESS_RESULT = 20,
     }
 }

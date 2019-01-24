@@ -15,7 +15,7 @@ namespace User.Bots
             int totalUnFollows = 0;
             int toDoUnFollows = job.Limit - job.LimitDone;
             int unfollowsCount = _behaviour.UnfollowAtOnce;
-            if (unfollowsCount > toDoUnFollows)
+            if (unfollowsCount == 0 || unfollowsCount > toDoUnFollows)
             {
                 unfollowsCount = toDoUnFollows;
             }

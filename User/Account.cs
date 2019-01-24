@@ -7,6 +7,7 @@ using Bot.Exception;
 using BotLog = Bot.Instagram.Model.Log;
 using LogEnum = Bot.Instagram.Model.Enum.Log;
 using User.Bots;
+using System.Collections.Generic;
 
 namespace User
 {
@@ -48,6 +49,7 @@ namespace User
         {
             Random rand = new Random();
             Schedule schedule = new Schedule();
+            List<string> failedUsernameLogin = new List<string>();
 
             try
             {
@@ -58,13 +60,24 @@ namespace User
                 {
                     //Setup new manager if job account changes or does not exist.
                     SetupManager(job);
-                   
-                    //Login to acc if not logged in already from previous job.
-                    if(!(await _manager.Login()))
+
+                    //Check for previously failed login attempt.
+                    if (failedUsernameLogin.Exists(x => x == _config.Username))
                     {
                         continue;
                     }
+                    //Login to acc if not logged in already from previous job.
+                    if (!(await _manager.Login()))
+                    {
+                        failedUsernameLogin.Add(_config.Username);
+                        continue;
+                    }
+
                     await _manager.AfterLogin();
+
+                    //@TODO !DELETE!
+                    //job.Type = (int) Bot.Instagram.Model.Enum.Job.TYPE_SCRAPE;
+                    //job.TargetTag = "refreshersk";
 
                     //Perform bot action
                     Bots.Get(job.Type)
@@ -72,20 +85,22 @@ namespace User
                         .Run(job)
                         .Wait();
 
+                    await _manager.AfterJob();
                     await Task.Delay(_config.WaitAfterJobFinish);
                 }
-
-
+            }
+            catch (ApplicationException e)
+            {
+                await _client.LogMessage($"Application error - {e.Message}", (int) LogEnum.TYPE_LOG_LEVEL_ERROR);
+            }
+            finally
+            {
                 /** Finish, close window. */
                 if (_manager != null)
                 {
                     _manager.Dispose();
                     _manager = null;
                 }
-            }
-            catch (ApplicationException e)
-            {
-                await _client.LogMessage("Application error", (int) LogEnum.TYPE_LOG_LEVEL_ERROR);
             }
         }
 
@@ -109,6 +124,7 @@ namespace User
                 accountConfig.Proxy = job.Proxy;
 
                 //Set new account, update behaviour by current job data.
+                _config = accountConfig;
                 _manager = new Manager(accountConfig, (ILogger) _logger);
                 _behaviour.SetValues(job.Settings);
             }

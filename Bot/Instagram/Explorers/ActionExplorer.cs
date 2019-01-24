@@ -46,10 +46,10 @@ namespace Bot.Instagram.Explorers
                     await Task.Delay(rand.Next(200, 500));
                 }
 
-                var follows = WebDriver.FindElementsByXPath(DomSelector.UNFOLLOW_FOLLOWED_USERS_LIST);
-                foreach (var follow in follows)
+                var follows = WebDriver.FindElementsByXPath(DomSelector.UNFOLLOW_FOLLOWED_BTNS);
+                foreach (var userFollowBtn in follows)
                 {
-                    await Task.Delay(rand.Next(500, 3500));
+                    await Task.Delay(_config.WaitSecondsBetweenActions);
 
                     //Skip follower item for behaviour purpose
                     if (randomSkip && rand.Next(0, 2) == 1)
@@ -57,17 +57,14 @@ namespace Bot.Instagram.Explorers
                         continue;
                     }
 
-                    var unfollowButton = follow.FindElement(By.XPath(".//button"));
-                    if (unfollowButton.Text == DomSelector.LABEL_UNFOLLOW_USER)
-                    {
-                        ExecuteJsClick(unfollowButton);
+                    ExecuteJsClick(userFollowBtn);
 
-                        //Wait for popup
-                        await Task.Delay(rand.Next(1000, 3000));
+                    //Wait for popup
+                    await Task.Delay(rand.Next(1000, 3000));
 
-                        var unfollowPopupButton = WebDriver.FindElementByXPath(DomSelector.UNFOLLOW_POPUP_BTN);
-                        ExecuteJsClick(unfollowPopupButton);
-                    }
+                    var unfollowPopupButton = WebDriver.FindElementByXPath(DomSelector.UNFOLLOW_POPUP_BTN);
+                    ExecuteJsClick(unfollowPopupButton);
+                   
 
                     if (++counter >= unfollowCount)
                     {
